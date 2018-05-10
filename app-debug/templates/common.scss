@@ -1,0 +1,17 @@
+body {
+    color: red;
+}
+
+h1 {
+    text-align: center;
+}
+
+#gameScreen {
+    position: absolute;
+    // width: 600px;
+    // height: 600px;
+    left: 50%;
+    margin-left: -300px;
+    top: 100px;
+    background-color: #ddd;
+}
