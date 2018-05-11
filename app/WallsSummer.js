@@ -39,7 +39,7 @@ export default class WallsSummer extends Game {
         super(options);
         this.getRootPlanePosition();
         this.getRootPrizePosition();
-        this.initBeginState();
+        // this.initBeginState();
     }
 
     beforeLoop() {
@@ -103,6 +103,7 @@ export default class WallsSummer extends Game {
             clearInterval(this.movePlanInterval);
         }
         let i = 0;
+        let intervaMs = this.options.planeMoveTimeout / this.options.moveStep;
         this.movePlanInterval = setInterval(() => {
             // this.options.plane.setPosition(this.LUT[i].x, this.LUT[i].y);
             this.options.plane.animateAction(this.ctx, {
@@ -119,7 +120,7 @@ export default class WallsSummer extends Game {
             if (i >= this.LUT.length) {
                 clearInterval(this.movePlanInterval);
             }
-        }, this.options.planeMoveTimeout / this.options.moveStep);
+        }, intervaMs);
 
         setTimeout(cb, this.options.planeMoveTimeout)
     }
