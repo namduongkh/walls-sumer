@@ -19,9 +19,12 @@ export default class WallsSummer extends Game {
         moveStep: 100,
         fadeTimeout: 300,
         planeMoveTimeout: 300,
+        dropTimeout: 300,
         config: {
-            planeMovePosition,
-            planeBezierPosition
+            planeMove,
+            planeBezier,
+            prizeDrop,
+            prizeDropMode
         }
     }
     */
@@ -30,10 +33,12 @@ export default class WallsSummer extends Game {
             loopMs: 3000,
             moveStep: 100,
             fadeTimeout: 300,
-            planeMoveTimeout: 300
+            planeMoveTimeout: 300,
+            dropTimeout: 300
         }, options);
         super(options);
         this.getRootPlanePosition();
+        this.getRootPrizePosition();
         this.initBeginState();
     }
 
@@ -50,7 +55,11 @@ export default class WallsSummer extends Game {
                     this.fadeInComponent(this.options.cream, cb);
                 },
                 (cb) => {
-                    this.fadeInComponent(this.options.prize, cb);
+                    if (!this.options.config.prizeDropMode) {
+                        this.fadeInComponent(this.options.prize, cb);
+                    } else {
+                        this.dropComponent(this.options.prize, this.options.config.prizeDrop, cb);
+                    }
                 },
                 (cb) => {
                     this.fadeInComponent(this.options.text, cb);
@@ -64,19 +73,26 @@ export default class WallsSummer extends Game {
             ], () => {
 
             });
-        }, 50);
+        }, 100);
     }
 
     initBeginState() {
         // console.log('initBeginState');
         this.options.plane.setPosition(this.rootPlanePosition.x, this.rootPlanePosition.y);
         this.hiddenComponent(this.options.cream);
-        this.hiddenComponent(this.options.prize);
         this.hiddenComponent(this.options.text);
         this.hiddenComponent(this.options.chessman);
+        if (!this.options.config.prizeDropMode) {
+            this.hiddenComponent(this.options.prize);
+        } else {
+            this.options.prize.setPosition(this.rootPrizePosition.x, this.rootPrizePosition.y);
+        }
     }
 
     movePlane(cb = function() {}) {
+        this.options.config.planeMovePosition = this.options.config.planeMove.position;
+        this.options.config.planeBezierPosition = this.options.config.planeBezier.position;
+
         let curve = new Bezier(this.options.plane.position.x, this.options.plane.position.y,
             this.options.config.planeBezierPosition.x, this.options.config.planeBezierPosition.y,
             this.options.config.planeMovePosition.x, this.options.config.planeMovePosition.y);
@@ -112,6 +128,10 @@ export default class WallsSummer extends Game {
         this.rootPlanePosition = this.options.plane.position;
     }
 
+    getRootPrizePosition() {
+        this.rootPrizePosition = this.options.prize.position;
+    }
+
     fadeInComponent(component, cb = function() {}) {
         if (component) {
             component.animateAction(this.ctx, {
@@ -130,6 +150,25 @@ export default class WallsSummer extends Game {
     hiddenComponent(component) {
         if (component) {
             component.setOpacity(0);
+        }
+    }
+
+    dropComponent(component, dropPositionComponent, cb = function() {}) {
+        if (component && dropPositionComponent) {
+            let dropPosition = {
+                x: dropPositionComponent.position.x,
+                y: dropPositionComponent.position.y,
+            }
+            component.animateAction(this.ctx, {
+                properties: {
+                    position: dropPosition,
+                },
+                duration: this.options.dropTimeout,
+                timingFunction: 'ease-in'
+            }, this.noop);
+            setTimeout(cb, this.options.dropTimeout);
+        } else {
+            cb();
         }
     }
 }
