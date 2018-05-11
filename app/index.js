@@ -1,3 +1,5 @@
-import CatchFruit from "./CatchFruit";
+import WallsSummer from "./WallsSummer";
+import Bezier from 'bezier-js'
 
-window.CatchFruit = CatchFruit;
+window.Bezier = Bezier;
+window.WallsSummer = WallsSummer;

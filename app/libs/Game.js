@@ -44,6 +44,7 @@ export default class Game {
     }
 
     start() {
+        this.firstRun = true;
         this.emitEvent('beforeStart');
         if (!this.playing) {
             this.playing = true;
@@ -73,12 +74,20 @@ export default class Game {
         if (!this.playing) {
             return;
         }
+        if (this.firstRun) {
+            this.loopAction();
+            this.firstRun = false;
+        }
         setTimeout(() => {
-            this.emitEvent('beforeLoop');
-            this.emitEvent('inLoop');
-            requestAnimationFrame(this.loop.bind(this));
-            this.emitEvent('afterLoop');
+            this.loopAction();
         }, this.options.loopMs);
+    }
+
+    loopAction() {
+        this.emitEvent('beforeLoop');
+        this.emitEvent('inLoop');
+        requestAnimationFrame(this.loop.bind(this));
+        this.emitEvent('afterLoop');
     }
 
     // draw() {
