@@ -74,20 +74,26 @@ export default class Game {
         if (!this.playing) {
             return;
         }
+        let loopMs = this.options.loopMs;
         if (this.firstRun) {
-            this.loopAction();
+            // this.loopAction(true);
             this.firstRun = false;
+            loopMs = 0;
         }
         setTimeout(() => {
             this.loopAction();
-        }, this.options.loopMs);
+        }, loopMs);
     }
 
-    loopAction() {
+    loopAction(norepeat) {
         this.emitEvent('beforeLoop');
-        this.emitEvent('inLoop');
-        requestAnimationFrame(this.loop.bind(this));
-        this.emitEvent('afterLoop');
+        setTimeout(() => {
+            this.emitEvent('inLoop');
+            if (!norepeat) {
+                requestAnimationFrame(this.loop.bind(this));
+            }
+            this.emitEvent('afterLoop');
+        }, 50);
     }
 
     // draw() {

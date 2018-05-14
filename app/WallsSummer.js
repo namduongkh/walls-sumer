@@ -39,7 +39,7 @@ export default class WallsSummer extends Game {
         super(options);
         this.getRootPlanePosition();
         this.getRootPrizePosition();
-        // this.initBeginState();
+        this.initBeginState();
     }
 
     beforeLoop() {
@@ -93,34 +93,45 @@ export default class WallsSummer extends Game {
         this.options.config.planeMovePosition = this.options.config.planeMove.position;
         this.options.config.planeBezierPosition = this.options.config.planeBezier.position;
 
-        let curve = new Bezier(this.options.plane.position.x, this.options.plane.position.y,
-            this.options.config.planeBezierPosition.x, this.options.config.planeBezierPosition.y,
-            this.options.config.planeMovePosition.x, this.options.config.planeMovePosition.y);
+        // let curve = new Bezier(this.options.plane.position.x, this.options.plane.position.y,
+        //     this.options.config.planeBezierPosition.x, this.options.config.planeBezierPosition.y,
+        //     this.options.config.planeMovePosition.x, this.options.config.planeMovePosition.y);
 
-        this.LUT = curve.getLUT(this.options.moveStep);
+        // this.LUT = curve.getLUT(this.options.moveStep);
 
-        if (this.movePlanInterval) {
-            clearInterval(this.movePlanInterval);
-        }
-        let i = 0;
-        let intervaMs = this.options.planeMoveTimeout / this.options.moveStep;
-        this.movePlanInterval = setInterval(() => {
-            // this.options.plane.setPosition(this.LUT[i].x, this.LUT[i].y);
-            this.options.plane.animateAction(this.ctx, {
-                properties: {
-                    position: {
-                        x: this.LUT[i].x,
-                        y: this.LUT[i].y
-                    }
-                },
-                duration: 0,
-                timingFunction: 'linear'
-            }, this.noop);
-            i++;
-            if (i >= this.LUT.length) {
-                clearInterval(this.movePlanInterval);
-            }
-        }, intervaMs);
+        // if (this.movePlanInterval) {
+        //     clearInterval(this.movePlanInterval);
+        // }
+        // let i = 0;
+        // let intervaMs = this.options.planeMoveTimeout / this.options.moveStep;
+        // this.movePlanInterval = setInterval(() => {
+        //     // this.options.plane.setPosition(this.LUT[i].x, this.LUT[i].y);
+        //     this.options.plane.animateAction(this.ctx, {
+        //         properties: {
+        //             position: {
+        //                 x: this.LUT[i].x,
+        //                 y: this.LUT[i].y
+        //             }
+        //         },
+        //         duration: 0,
+        //         timingFunction: 'linear'
+        //     }, this.noop);
+        //     i++;
+        //     if (i >= this.LUT.length) {
+        //         clearInterval(this.movePlanInterval);
+        //     }
+        // }, intervaMs);
+
+        this.options.plane.animateAction(this.ctx, {
+            properties: {
+                position: {
+                    x: this.options.config.planeMovePosition.x,
+                    y: this.options.config.planeMovePosition.y,
+                }
+            },
+            duration: this.options.planeMoveTimeout,
+            timingFunction: 'ease-in-out'
+        }, this.noop);
 
         setTimeout(cb, this.options.planeMoveTimeout)
     }
@@ -135,12 +146,18 @@ export default class WallsSummer extends Game {
 
     fadeInComponent(component, cb = function() {}) {
         if (component) {
+            // console.log('size', component.size.width, component.size.height);
+            // component.setSize(component.size.width, component.size.height);
             component.animateAction(this.ctx, {
                 properties: {
                     opacity: 1,
+                    // size: {
+                    //     width: component.size.width,
+                    //     height: component.size.height,
+                    // }
                 },
                 duration: this.options.fadeTimeout,
-                timingFunction: 'linear'
+                // timingFunction: ''
             }, this.noop);
             setTimeout(cb, this.options.fadeTimeout);
         } else {
@@ -150,7 +167,13 @@ export default class WallsSummer extends Game {
 
     hiddenComponent(component) {
         if (component) {
-            component.setOpacity(0);
+            // component.setOpacity(0);
+            component.animateAction(this.ctx, {
+                properties: {
+                    opacity: 0,
+                },
+                duration: 0,
+            }, this.noop);
         }
     }
 
@@ -165,7 +188,7 @@ export default class WallsSummer extends Game {
                     position: dropPosition,
                 },
                 duration: this.options.dropTimeout,
-                timingFunction: 'ease-in'
+                // timingFunction: 'ease-in'
             }, this.noop);
             setTimeout(cb, this.options.dropTimeout);
         } else {
