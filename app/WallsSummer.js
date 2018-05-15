@@ -113,6 +113,7 @@ export default class WallsSummer extends Game {
 
     initBeginState() {
         // console.log('initBeginState');
+        this.getRootPlanePosition();        
         this.options.plane.setPosition(this.rootPlanePosition.x, this.rootPlanePosition.y);
         this.hiddenComponent(this.options.cream);
         this.hiddenComponent(this.options.texts);
@@ -240,9 +241,12 @@ export default class WallsSummer extends Game {
                     //     },
                     //     duration: timeout - (timeout / 100 * 10),
                     // }, that.options.noop);
-                    let transform = component.node.style.transform.replace(/rotate\(-{0,1}\d+deg\)/gi, "");
+                    // console.log('before',  component.node.style.transform);
+                    let transform = component.node.style.transform.toString().replace(/rotate\([-]{0,1}[\d\.]+deg\)/gi, "");
+                    // console.log('after', transform);
                     component.css(component.node, {
-                        transform: transform + ' rotate(' + (positive ? deg : -deg) + 'deg)'
+                        transform: transform + ' rotate(' + (positive ? deg : -deg) + 'deg)',
+                        transition: 'transform ' + (timeout - (timeout * 0.1)) / 1000 + 's linear'
                     });
                     if (i > 1) {
                         setTimeout(() => {
@@ -250,7 +254,8 @@ export default class WallsSummer extends Game {
                         }, timeout);
                     } else {
                         component.css(component.node, {
-                            transform: transform + ' rotate(' + 0 + 'deg)'
+                            transform: transform + ' rotate(' + 0 + 'deg)',
+                            transition: 'transform ' + (timeout - (timeout * 0.1)) / 1000 + 's linear'
                         });
                     }
                 }
