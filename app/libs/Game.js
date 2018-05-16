@@ -19,7 +19,7 @@ export default class Game {
             },
             ctx: {},
             noop: function() {},
-            loopMs: 0,
+            loopDuration: 0,
         }, options);
         this.initCallbacks();
         this.emitEvent('afterInit');
@@ -74,15 +74,15 @@ export default class Game {
         if (!this.playing) {
             return;
         }
-        let loopMs = this.options.loopMs;
+        let loopDuration = this.options.loopDuration;
         if (this.firstRun) {
             // this.loopAction(true);
             this.firstRun = false;
-            loopMs = 0;
+            loopDuration = 0;
         }
         setTimeout(() => {
             this.loopAction();
-        }, loopMs);
+        }, loopDuration);
     }
 
     loopAction(norepeat) {
