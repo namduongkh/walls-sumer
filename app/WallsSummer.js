@@ -112,11 +112,14 @@ export default class WallsSummer extends Game {
                 //     this.fadeInComponent(this.options.chessman, this.options.fadeDuration, cb);
                 // },
                 (cb) => {
-                    // this.flareAnimate(this.options.flare, cb);
-                    this.zoomInOutComponent(this.options.zoomInOut.component, this.options.zoomInOut.duration, this.options.zoomInOut.percent, cb);
+                    cb();
+                    // this.zoomInOutComponent(this.options.zoomInOut.component, this.options.zoomInOut.duration, this.options.zoomInOut.percent, cb);
                 },
                 (cb) => {
                     this.movePlane(cb);
+                },
+                (cb) => {
+                    this.flareAnimate(this.options.flare, cb);
                 },
             ], () => {
 
@@ -139,8 +142,8 @@ export default class WallsSummer extends Game {
         // }
         if (this.options.flare) {
             this.resetFlare(this.options.flare);
-            let baseComponent = this.options.screen.find(this.options.flareAnimate.baseComponentName);
-            this.hiddenComponent(baseComponent);
+            // let baseComponent = this.options.screen.find(this.options.flareAnimate.baseComponentName);
+            // this.hiddenComponent(baseComponent);
         }
     }
 
@@ -378,7 +381,7 @@ export default class WallsSummer extends Game {
 
             // that.hiddenComponent(baseComponent);
             // setTimeout(() => {
-            that.fadeInComponent(baseComponent, that.options.flareAnimate.duration);
+            // that.fadeInComponent(baseComponent, that.options.flareAnimate.duration);
             // }, 50);
 
             async.series([
@@ -388,7 +391,7 @@ export default class WallsSummer extends Game {
                         properties: {
                             opacity: 1
                         },
-                        duration: (that.options.flareAnimate.duration || 500) * 0.2,
+                        duration: (that.options.flareAnimate.duration || 500) * 0.1,
                     }, c);
                 },
                 (c) => {
@@ -396,12 +399,13 @@ export default class WallsSummer extends Game {
                     flare.animateAction(that.options.ctx, {
                         properties: {
                             position: {
-                                x: flare.position.x + baseComponent.size.width,
+                                // x: flare.position.x + baseComponent.size.width,
+                                x: baseComponent.position.x + baseComponent.size.width + flare.size.width,
                                 y: flare.position.y
                             }
                         },
                         timingFunction: 'ease-in-out',
-                        duration: (that.options.flareAnimate.duration || 500) * 0.6,
+                        duration: (that.options.flareAnimate.duration || 500) * 0.8,
                     }, c);
                 },
                 (c) => {
@@ -410,7 +414,7 @@ export default class WallsSummer extends Game {
                         properties: {
                             opacity: 0
                         },
-                        duration: (that.options.flareAnimate.duration || 500) * 0.2,
+                        duration: (that.options.flareAnimate.duration || 500) * 0.1,
                     }, c);
                 },
                 (c) => {
@@ -429,8 +433,9 @@ export default class WallsSummer extends Game {
 
     resetFlare(flare) {
         this.hiddenComponent(flare);
-        let rootPosition = this.options.screen.find(this.options.flareAnimate.rootPositionName);
-        flare.setPosition(rootPosition.position.x, rootPosition.position.y);
+        // let rootPosition = this.options.screen.find(this.options.flareAnimate.rootPositionName);
+        let baseComponent = this.options.screen.find(this.options.flareAnimate.baseComponentName);
+        flare.setPosition(baseComponent.position.x - flare.size.width, baseComponent.position.y);
     }
 
     zoomInOutComponent(component, duration, zoomPercent, cb = () => {}) {
