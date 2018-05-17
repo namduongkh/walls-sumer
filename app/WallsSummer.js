@@ -99,23 +99,24 @@ export default class WallsSummer extends Game {
                     this.fadeInComponent(this.options.cream, this.options.fadeDuration, cb);
                 },
                 (cb) => {
-                    if (!this.options.config.prizeDropMode) {
-                        this.prizeAnimate(this.options.prize, cb)
-                    } else {
-                        this.dropComponent(this.options.prize, this.options.config.prizeDrop, cb);
-                    }
+                    // if (!this.options.config.prizeDropMode) {
+                    this.prizeAnimate(this.options.prize, cb);
+                    // } else {
+                    //     this.dropComponent(this.options.prize, this.options.config.prizeDrop, cb);
+                    // }
                 },
                 (cb) => {
-                    this.fadeInComponent(this.options.texts, this.options.fadeDuration, cb);
+                    this.fadeInComponent(this.options.texts, this.options.textDuration, cb);
                 },
+                // (cb) => {
+                //     this.fadeInComponent(this.options.chessman, this.options.fadeDuration, cb);
+                // },
                 (cb) => {
-                    this.fadeInComponent(this.options.chessman, this.options.fadeDuration, cb);
+                    // this.flareAnimate(this.options.flare, cb);
+                    this.zoomInOutComponent(this.options.zoomInOut.component, this.options.zoomInOut.duration, this.options.zoomInOut.percent, cb);
                 },
                 (cb) => {
                     this.movePlane(cb);
-                },
-                (cb) => {
-                    this.flareAnimate(this.options.flare, cb);
                 },
             ], () => {
 
@@ -129,15 +130,18 @@ export default class WallsSummer extends Game {
         this.options.plane.setPosition(this.rootPlanePosition.x, this.rootPlanePosition.y);
         this.hiddenComponent(this.options.cream);
         this.hiddenComponent(this.options.texts);
-        this.hiddenComponent(this.options.chessman);
-        if (!this.options.config.prizeDropMode) {
-            this.hiddenComponent(this.options.prize);
-        } else {
-            this.options.prize.setPosition(this.rootPrizePosition.x, this.rootPrizePosition.y);
+        // this.hiddenComponent(this.options.chessman);
+        // if (!this.options.config.prizeDropMode) {
+        // console.log('this.options.prize', this.options.prize);
+        this.hiddenComponent(this.options.prize);
+        // } else {
+        //     this.options.prize.setPosition(this.rootPrizePosition.x, this.rootPrizePosition.y);
+        // }
+        if (this.options.flare) {
+            this.resetFlare(this.options.flare);
+            let baseComponent = this.options.screen.find(this.options.flareAnimate.baseComponentName);
+            this.hiddenComponent(baseComponent);
         }
-        this.resetFlare(this.options.flare);
-        let baseComponent = this.options.screen.find(this.options.flareAnimate.baseComponentName);
-        this.hiddenComponent(baseComponent);
     }
 
     movePlane(cb = () => {}) {
@@ -190,7 +194,7 @@ export default class WallsSummer extends Game {
     }
 
     getRootPlanePosition() {
-        let planeRoot = this.options.screen.find('planeroot');
+        let planeRoot = this.options.screen.find(this.options.planeAnimate.rootName);
         this.rootPlanePosition = planeRoot ? planeRoot.position : this.options.plane.position;
     }
 
@@ -250,7 +254,7 @@ export default class WallsSummer extends Game {
     shakeComponent(component, timeout, cb = () => {}) {
         if (component) {
             let that = this;
-
+            let posComponent = this.options.screen.find(this.options.prizeAnimate.prizePosName);
             component.getNode(() => {
                 function shake(i, positive, timeout, deg) {
                     // component.animateAction(that.options.ctx, {
@@ -298,6 +302,10 @@ export default class WallsSummer extends Game {
                         duration: timeout / 2,
                         // timingFunction: 'ease-in-out'
                     }, c);
+                },
+                (c) => {
+                    component.setPosition(posComponent.position.x, posComponent.position.y);
+                    c();
                 }
             ]);
 
@@ -423,5 +431,32 @@ export default class WallsSummer extends Game {
         this.hiddenComponent(flare);
         let rootPosition = this.options.screen.find(this.options.flareAnimate.rootPositionName);
         flare.setPosition(rootPosition.position.x, rootPosition.position.y);
+    }
+
+    zoomInOutComponent(component, duration, zoomPercent, cb = () => {}) {
+        if (component) {
+            let posComponent = this.options.screen.find(this.options.zoomInOut.rootPosName);
+            async.series([
+                (c) => {
+                    component.scaleAction(this.options.ctx, {
+                        scale: zoomPercent,
+                        duration: duration / 2,
+                    }, c);
+                },
+                (c) => {
+                    component.scaleAction(this.options.ctx, {
+                        scale: 100 / (zoomPercent / 100),
+                        duration: duration / 2,
+                    }, c);
+                },
+                (c) => {
+                    component.setPosition(posComponent.position.x, posComponent.position.y);
+                    c();
+                }
+            ]);
+            setTimeout(cb, duration);
+        } else {
+            cb();
+        }
     }
 }
