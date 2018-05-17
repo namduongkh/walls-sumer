@@ -246,7 +246,7 @@ export default class WallsSummer extends Game {
             let that = this;
             that.fadeInComponent(component, this.options.prizeAnimate.fadeInDuration);
             setTimeout(function() {
-                that.shakeComponent(component, duration - that.options.prizeAnimate.shakeDelay);
+                that.shakeComponent(component, duration - that.options.prizeAnimate.shakeDelay, that.options.prizeAnimate.zoomDuration);
             }, that.options.prizeAnimate.shakeDelay);
             setTimeout(cb, duration);
         } else {
@@ -254,24 +254,17 @@ export default class WallsSummer extends Game {
         }
     }
 
-    shakeComponent(component, timeout, cb = () => {}) {
+    shakeComponent(component, duration, zoomDuration, cb = () => {}) {
+        zoomDuration = zoomDuration || duration;
         if (component) {
             let that = this;
-            let posComponent = this.options.screen.find(this.options.prizeAnimate.prizePosName);
+            // let posComponent = this.options.screen.find(this.options.prizeAnimate.prizePosName);
             component.getNode(() => {
                 function shake(i, positive, timeout, deg) {
-                    // component.animateAction(that.options.ctx, {
-                    //     properties: {
-                    //         rotation: positive ? deg : -deg,
-                    //     },
-                    //     duration: timeout - (timeout / 100 * 10),
-                    // }, that.options.noop);
-                    // console.log('before',  component.node.style.transform);
+                    // console.log('Shake', i);
                     let transform = component.node.style.transform.toString().replace(/rotate\([-]{0,1}[\d\.]+deg\)/gi, "");
-                    // console.log('after', transform);
                     component.css(component.node, {
                         transform: transform + ' rotate(' + (positive ? deg : -deg) + 'deg)',
-                        transition: 'transform ' + (timeout * 0.9) / 1000 + 's linear'
                     });
                     if (i > 1) {
                         setTimeout(() => {
@@ -280,39 +273,60 @@ export default class WallsSummer extends Game {
                     } else {
                         component.css(component.node, {
                             transform: transform + ' rotate(' + 0 + 'deg)',
-                            transition: 'transform ' + (timeout * 0.9) / 1000 + 's linear'
                         });
                     }
                 }
 
+                component.css(component.node, {
+                    transition: 'transform ' + ((zoomDuration / 2) / 1000) + 's linear'
+                });
+
                 shake(that.options.prizeAnimate.shakeTimes,
-                    true, timeout / that.options.prizeAnimate.shakeTimes,
+                    true, duration / that.options.prizeAnimate.shakeTimes,
                     that.options.prizeAnimate.shakeDeg);
 
                 // component.node.className = component.node.className += ' shake-ani';
             });
 
-            async.series([(c) => {
-                    component.scaleAction(this.options.ctx, {
-                        scale: 110,
-                        duration: timeout / 2,
-                        // timingFunction: 'ease-in-out'
-                    }, c);
-                },
-                (c) => {
-                    component.scaleAction(this.options.ctx, {
-                        scale: 90.909090909090,
-                        duration: timeout / 2,
-                        // timingFunction: 'ease-in-out'
-                    }, c);
-                },
-                (c) => {
-                    component.setPosition(posComponent.position.x, posComponent.position.y);
-                    c();
-                }
-            ]);
+            // console.time('zoom');
+            // async.series([(c) => {
+            //         component.scaleAction(this.options.ctx, {
+            //             scale: 110,
+            //             duration: duration / 2,
+            //         }, c);
+            //     },
+            //     (c) => {
+            //         console.log('Zoom Out');
+            //         console.timeEnd('zoom')
+            //         component.scaleAction(this.options.ctx, {
+            //             scale: 100 / 1.1,
+            //             duration: duration / 2,
+            //         }, c);
+            //     },
+            //     (c) => {
+            //         component.setPosition(posComponent.position.x, posComponent.position.y);
+            //         c();
+            //     }
+            // ]);
 
-            setTimeout(cb, timeout);
+            this.zoomInOutComponent(component, zoomDuration, 110, this.options.prizeAnimate.prizePosName);
+
+            // component.scaleAction(this.options.ctx, {
+            //     scale: 110,
+            //     duration: duration / 2,
+            // }, this.options.noop);
+
+            // setTimeout(() => {
+            //     console.log('Zoom Out');
+            //     console.timeEnd('zoom')
+            //     component.scaleAction(this.options.ctx, {
+            //         scale: 100 / 1.1,
+            //         duration: duration / 2,
+            //     }, this.options.noop);
+            //     component.setPosition(posComponent.position.x, posComponent.position.y);
+            // }, duration / 2);
+
+            setTimeout(cb, duration);
         } else {
             cb();
         }
@@ -438,27 +452,39 @@ export default class WallsSummer extends Game {
         flare.setPosition(baseComponent.position.x - flare.size.width, baseComponent.position.y);
     }
 
-    zoomInOutComponent(component, duration, zoomPercent, cb = () => {}) {
+    zoomInOutComponent(component, duration, zoomPercent, rootPosName, cb = () => {}) {
         if (component) {
-            let posComponent = this.options.screen.find(this.options.zoomInOut.rootPosName);
-            async.series([
-                (c) => {
-                    component.scaleAction(this.options.ctx, {
-                        scale: zoomPercent,
-                        duration: duration / 2,
-                    }, c);
-                },
-                (c) => {
-                    component.scaleAction(this.options.ctx, {
-                        scale: 100 / (zoomPercent / 100),
-                        duration: duration / 2,
-                    }, c);
-                },
-                (c) => {
-                    component.setPosition(posComponent.position.x, posComponent.position.y);
-                    c();
-                }
-            ]);
+            let posComponent = this.options.screen.find(rootPosName);
+            // async.series([
+            //     (c) => {
+            //         component.scaleAction(this.options.ctx, {
+            //             scale: zoomPercent,
+            //             duration: duration / 2,
+            //         }, c);
+            //     },
+            //     (c) => {
+            //         component.scaleAction(this.options.ctx, {
+            //             scale: 100 / (zoomPercent / 100),
+            //             duration: duration / 2,
+            //         }, c);
+            //     },
+            //     (c) => {
+            //         component.setPosition(posComponent.position.x, posComponent.position.y);
+            //         c();
+            //     }
+            // ]);
+            component.scaleAction(this.options.ctx, {
+                scale: zoomPercent,
+                duration: duration / 2,
+            }, this.options.noop);
+
+            setTimeout(() => {
+                component.scaleAction(this.options.ctx, {
+                    scale: 100 / (zoomPercent / 100),
+                    duration: duration / 2,
+                }, this.options.noop);
+                component.setPosition(posComponent.position.x, posComponent.position.y);
+            }, duration / 2);
             setTimeout(cb, duration);
         } else {
             cb();
