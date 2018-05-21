@@ -414,6 +414,7 @@ export default class WallsSummer extends Game {
                         properties: {
                             position: {
                                 // x: flare.position.x + baseComponent.size.width,
+                                // x: baseComponent.position.x + baseComponent.size.width,
                                 x: baseComponent.position.x + baseComponent.size.width + flare.size.width,
                                 y: flare.position.y
                             }
